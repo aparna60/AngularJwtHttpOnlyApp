@@ -5,16 +5,19 @@ import { inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BASE_API_URL } from './app.config';
 
-export const tokenInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> => {
-  const httpClient = inject(HttpClient);
-  private baseUrl = inject(BASE_API_URL);
+export const tokenInterceptor: HttpInterceptorFn = (
+  req: HttpRequest<any>,
+  next: HttpHandlerFn
+): Observable<HttpEvent<any>> => {
 
+  const httpClient = inject(HttpClient);
+  const baseUrl = inject(BASE_API_URL); // ✅ fixed (removed private)
 
   return next(req).pipe(
     catchError(error => {
       if (error.status === 401) {
         // Attempt to refresh token
-        return httpClient.post(`${this.baseUrl}/api/refresh`, {}).pipe(
+        return httpClient.post(`${baseUrl}/api/refresh`, {}).pipe(
           switchMap(() => {
             // Retry the original request
             return next(req);
